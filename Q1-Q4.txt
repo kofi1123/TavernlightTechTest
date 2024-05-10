@@ -1,0 +1,62 @@
+local function releaseStorage(player)
+    player:setStorageValue(1000, -1)
+end
+
+function onLogout(player)
+    if player:getStorageValue(1000) >= 1 then -- changed from == to >= assuming we wanted any positive integer to be released
+        releaseStorage(player) -- removed add event and just called releaseStorage directly
+    end
+    -- Removed 'return true' because it seemed redundant
+end
+
+function printSmallGuildNames(memberCount)
+    -- this method is supposed to print names of all guilds that have less than memberCount max members
+    local selectGuildQuery = "SELECT name FROM guilds WHERE max_members < %d;"
+    local resultId = db.storeQuery(string.format(selectGuildQuery, memberCount))
+    if resultId ~= false then -- if resultId is false then there were no rows returned from query
+        repeat
+            print(result.getString(resultId, "name)) -- print the name of the guild
+        until not result.next(resultId) -- loop through each guild found from the query
+        result.free(resultId)
+    end
+end
+
+function removeMemberFromPlayerParty(playerId, membername)
+    player = Player(playerId)
+    local party = player:getParty()
+    
+    local leader = party:getLeader() --used to get leader of party with playerId
+    if playerId ~= leader:getId() then -- Added this so only the leader is eligible to kick players from party
+        for k,v in pairs(party:getMembers()) do
+            if v == Player(membername) then
+                party:removeMember(Player(membername))
+                break -- Adding break to stop iteration after player membername has been found. This assumes all membernames are unique
+            end
+        end
+    end
+end
+
+void Game::addItemToPlayer(const std::string& recipient, uint16_t itemId)
+{
+    Player* player = g_game.getPlayerByName(recipient);
+    if (!player) {
+        player = new Player(nullptr);
+        if (!IOLoginData::loadPlayerByName(player, recipient)) {
+            free(player); -- Added to remove player data from heap if loadPlayerByName fails
+            return;
+        }
+    }
+
+    Item* item = Item::CreateItem(itemId);
+    if (!item) {
+        return;
+    }
+
+    g_game.internalAddItem(player->getInbox(), item, INDEX_WHEREEVER, FLAG_NOLIMIT);
+    -- if a copy of item is added to player you can add a 'free(item)' line here
+    
+    if (player->isOffline()) {
+        IOLoginData::savePlayer(player);
+        free(player); -- Added to remove player data from heap if offline
+    }
+}
