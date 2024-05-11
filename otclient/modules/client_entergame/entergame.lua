@@ -5,10 +5,13 @@ local loadBox
 local enterGame
 local motdWindow
 local motdButton
+local q7Window
+local q7Button
 local enterGameButton
 local clientBox
 local protocolLogin
 local motdEnabled = true
+local jumpButton
 
 -- private functions
 local function onError(protocol, message, errorCode)
@@ -105,6 +108,7 @@ function EnterGame.init()
   enterGame = g_ui.displayUI('entergame')
   enterGameButton = modules.client_topmenu.addLeftButton('enterGameButton', tr('Login') .. ' (Ctrl + G)', '/images/topbuttons/login', EnterGame.openWindow)
   motdButton = modules.client_topmenu.addLeftButton('motdButton', tr('Message of the day'), '/images/topbuttons/motd', EnterGame.displayMotd)
+  q7Button =  modules.client_topmenu.addLeftButton('q7Button', tr('Question 7'), '/images/topbuttons/motd', EnterGame.displayQ7)
   motdButton:hide()
   g_keyboard.bindKeyDown('Ctrl+G', EnterGame.openWindow)
 
@@ -178,6 +182,14 @@ function EnterGame.terminate()
   if motdButton then
     motdButton:destroy()
     motdButton = nil
+  end
+  if q7Window then
+    q7Window:destroy()
+    q7Window = nil
+  end
+  if q7Button then
+    q7Button:destroy()
+    q7Button = nil
   end
   if loadBox then
     loadBox:destroy()
@@ -344,6 +356,24 @@ function EnterGame.displayMotd()
   if not motdWindow then
     motdWindow = displayInfoBox(tr('Message of the day'), G.motdMessage)
     motdWindow.onOk = function() motdWindow = nil end
+  end
+end
+
+function EnterGame.displayQ7()
+  if not q7Window then
+    q7Window = g_ui.displayUI('q7Window')
+    jumpButton = q7Window:getChildById('jumpButton')
+  end
+end
+
+function EnterGame.updateJump()
+  if jumpButton:getMarginRight() >= 500 then
+    local x = math.random(100, 150)
+    local y = math.random(100, 600)
+    jumpButton:setMarginRight(x)
+    jumpButton:setMarginBottom(y)
+  else
+    jumpButton:setMarginRight(jumpButton:getMarginRight() + 50)
   end
 end
 

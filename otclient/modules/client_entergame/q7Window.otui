@@ -1,0 +1,13 @@
+MainWindow
+  id: q7Window
+  size: 700 700
+  
+  Button
+    id: jumpButton
+    !text: tr('Jump!')
+    &clicked: false
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin-bottom: 200
+    margin-right: 300
+    @onClick: EnterGame.updateJump()
